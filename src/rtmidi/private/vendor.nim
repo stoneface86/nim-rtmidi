@@ -10,29 +10,38 @@ func cinclude(incl: string): string =
   const includePrefix = when defined(vcc): "/I" else: "-I"
   includePrefix & incl
 
-const
-  apiDefine = block:
+when defined(rtmidiUseDll):
+  const rtmidiDll* {.strdefine.} = block:
     when defined(linux):
-      "__LINUX_ALSA__"
+      "librtmidi.so"
     elif defined(macosx):
-      "__MACOSX_CORE__"
-    elif defined(windows):
-      "__WINDOWS_MM__"
+      "librtmidi.dylib"
     else:
-      {. error: "unsupported operating system" .}
-  rtmidiPassc = block:
-    var args: seq[string]
-    args.add cdefine(apiDefine)
-    when defined(vcc):
-      args.add "/EHsc"
-    when defined(rtmidiUseJack):
-      when defined(windows):
-        {. error: "Cannot use JACK on windows" .}
-      args.add cdefine("__UNIX_JACK__")
-    quoteShellCommand args
+      "rtmidi.dll"
+else:
+  const
+    apiDefine = block:
+      when defined(linux):
+        "__LINUX_ALSA__"
+      elif defined(macosx):
+        "__MACOSX_CORE__"
+      elif defined(windows):
+        "__WINDOWS_MM__"
+      else:
+        {. error: "unsupported operating system" .}
+    rtmidiPassc = block:
+      var args: seq[string]
+      args.add cdefine(apiDefine)
+      when defined(vcc):
+        args.add "/EHsc"
+      when defined(rtmidiUseJack):
+        when defined(windows):
+          {. error: "Cannot use JACK on windows" .}
+        args.add cdefine("__UNIX_JACK__")
+      quoteShellCommand args
 
-{. compile("rtmidi_c.cpp", rtmidiPassc) .}
-{. compile("RtMidi.cpp", rtmidiPassc) .}
+  {. compile("rtmidi_c.cpp", rtmidiPassc) .}
+  {. compile("RtMidi.cpp", rtmidiPassc) .}
 
 {. passc: quoteShell(cinclude(currentSourcePath().parentDir())) .}
 

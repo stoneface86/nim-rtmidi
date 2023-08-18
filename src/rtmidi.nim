@@ -169,39 +169,39 @@ proc error*(ty: MidiError; errorStr: string) =
   ##
   rtmidi_error(cast[RtMidiErrorType](ty), errorStr.cstring)
 
-template openPort*(dev: var SomeMidi; portNum: Natural = 0; portName = "RtMidi") =
+proc openPort*(dev: var SomeMidi; portNum: Natural = 0; portName = "RtMidi") =
   ## Opens a MIDI port `portNum` with a given name.
   ##
   rtmidi_open_port(dev.impl, portNum.cuint, portName.cstring)
 
-template openVirtualPort*(dev: var SomeMidi; portName: string) =
+proc openVirtualPort*(dev: var SomeMidi; portName: string) =
   ## Opens a virtual MIDI port. Only supported on the JACK, ALSA and CoreMIDI
   ## backends.
   ##
   rtmidi_open_virtual_port(dev.impl, portName.cstring)
 
-template closePort*(dev: var SomeMidi) =
+proc closePort*(dev: var SomeMidi) =
   ## Closes the opened port.
   ##
   rtmidi_close_port(dev.impl)
 
-template portCount*(dev: SomeMidi): int =
+proc portCount*(dev: SomeMidi): int =
   ## Gets the number of available ports.
   ##
   rtmidi_get_port_count(dev.impl).int
 
-template portName*(dev: SomeMidi; portNum: Natural): string =
+proc portName*(dev: SomeMidi; portNum: Natural): string =
   ## Gets the name of the given port.
   ##
   $(rtmidi_get_port_name(dev.impl, portNum.cuint))
 
-template midiIn*(): MidiIn =
+proc midiIn*(): MidiIn =
   ## Creates a `MidiIn` for receiving incoming MIDI data, using default
   ## settings.
   ##
   MidiIn(impl: rtmidi_in_create_default())
 
-template midiIn*(api: MidiApi; clientName: string; queueSizeLimit: Natural): MidiIn =
+proc midiIn*(api: MidiApi; clientName: string; queueSizeLimit: Natural): MidiIn =
   ## Creates a `MidiIn` with the given api, client name and queue size limit.
   ##
   MidiIn(impl: rtmidi_in_create(
@@ -210,7 +210,7 @@ template midiIn*(api: MidiApi; clientName: string; queueSizeLimit: Natural): Mid
     queueSizeLimit.cuint
   ))
 
-template api*(dev: MidiIn): MidiApi =
+proc api*(dev: MidiIn): MidiApi =
   cast[MidiApi](rtmidi_in_get_current_api(dev.impl))
 
 proc callbackWrapper(timestamp: float64; msg: ptr UncheckedArray[byte]; msgSize: csize_t; data: pointer) {.noconv.} =
@@ -252,15 +252,15 @@ proc recv*(dev: var MidiIn; msg: var seq[byte]): float64 =
   if msgsize > 0:
     copyMem(msg[0].addr, msgbuf[0].addr, msgsize.int)
 
-template midiOut*(): MidiOut =
+proc midiOut*(): MidiOut =
   MidiOut(impl: rtmidi_out_create_default())
 
-template midiOut*(api: MidiApi; clientName: string): MidiOut =
+proc midiOut*(api: MidiApi; clientName: string): MidiOut =
   MidiOut(impl: rtmidi_out_create(
     cast[RtMidiApi](api), clientName.cstring
   ))
 
-template api*(dev: MidiOut): MidiApi =
+proc api*(dev: MidiOut): MidiApi =
   cast[MidiApi](rtmidi_out_get_current_api(dev.impl))
 
 proc send*(dev: var MidiOut; msg: openArray[byte]): int {.discardable.} =

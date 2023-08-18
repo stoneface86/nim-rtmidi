@@ -48,13 +48,20 @@ import rtmidi
 
 ## Options
 
-| Define        | Default     | Description                                      |
-|---------------|-------------|--------------------------------------------------|
-| rtmidiUseJack | not present | Enables compilation of the JACK backend          |
-| rtmidiDynamic | not present | Dynamic link to rtmidi instead of static linking |
+| Define        | Default       | Description                                      |
+|---------------|---------------|--------------------------------------------------|
+| rtmidiUseJack | not present   | Enables compilation of the JACK backend          |
+| rtmidiUseDll  | not present   | Dynamic link to rtmidi instead of static linking |
+| rtmidiDll     | depends on OS | Set the name of the rtmidi dynamic library used |
 
 Support for the JACK API is not compiled in by default, so define
 `rtmidiUseJack` to enable it when static linking.
 
-Static linking is done by default, define `rtmidiDynamic` to link dynamically.
+Static linking is done by default, define `rtmidiUseDll` to link dynamically.
+By default the DLL file used depends on your OS:
 
+ - Linux: `librtmidi.so`
+ - MacOS: `librtmidi.dylib`
+ - Windows: `rtmidi.dll`
+
+Define `rtmidiDll` to override this filename.
