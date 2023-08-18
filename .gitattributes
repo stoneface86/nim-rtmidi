@@ -1,0 +1,4 @@
+src/rtmidi/private/rtmidi_c.cpp     linguist-vendored
+src/rtmidi/private/rtmidi_c.h       linguist-vendored
+src/rtmidi/private/RtMidi.cpp       linguist-vendored
+src/rtmidi/private/RtMidi.h         linguist-vendored
