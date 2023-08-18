@@ -20,11 +20,11 @@
 ## 
 ## For receiving data with MidiIn, you can either use a callback to handle the
 ## data as soon as it comes in, or poll for it manually. Use `setCallback` to
-## register the callback, or use `recv` to receive the message manually. Care
-## is needed when using a callback, as a foreign thread managed by RtMidi will
-## call it.
+## register the callback, or use `recvMidi` to receive the message manually.
+## Care is needed when using a callback, as a foreign thread managed by RtMidi
+## will call it.
 ## 
-## For sending data with MidiOut, using the `send` proc to send an array of
+## For sending data with MidiOut, using the `sendMidi` proc to send an array of
 ## bytes to a previously opened port.
 ## 
 ## Error Handling:
@@ -40,7 +40,6 @@
 ##   quit(1)
 ## ```
 ##
-
 
 import rtmidi/bindings
 
@@ -58,18 +57,26 @@ type
   MidiIn* = object
     ## MIDI input interface. Allows you to query available MIDI input ports and
     ## open one to recieve incoming data from a connected MIDI device.
+    ## 
+    ## A destructor is provided that automatically calls rtmidi_in_free.
+    ## RtMidiIn objects cannot be copied.
     ##
     impl*: RtMidiInPtr
-      ## Implementation. Contains a reference to an RtMidiIn.
+      ## Implementation. Contains a reference to an RtMidiWrapper containing
+      ## an RtMidiIn.
       ##
     callback: MidiCallback
   
   MidiOut* = object
-    ## MIDI output. Allows you to query available MIDI output ports and open
-    ## one to send data to a connected MIDI device.
+    ## MIDI output interface. Allows you to query available MIDI output ports
+    ## and open one to send data to a connected MIDI device.
+    ## 
+    ## A destructor is provided that automatically calls rtmidi_out_free.
+    ## RtMidiIn objects cannot be copied.
     ##
     impl*: RtMidiOutPtr
-      ## Implementation. Contains a reference to an RtMidiOut.
+      ## Implementation. Contains a reference to an RtMidiWrapper containing
+      ## an RtMidiOut.
       ##
     callback: MidiCallback
 
@@ -105,7 +112,7 @@ type
   MidiMsgType* = enum
     ## Special MIDI message types, for filtering incoming data.
     ##
-    midiSysex
+    midiSysex ## System Exclusive
     midiTime
     midiSense
 
@@ -195,13 +202,14 @@ proc portName*(dev: SomeMidi; portNum: Natural): string =
   ##
   $(rtmidi_get_port_name(dev.impl, portNum.cuint))
 
-proc midiIn*(): MidiIn =
+proc initMidiIn*(): MidiIn =
   ## Creates a `MidiIn` for receiving incoming MIDI data, using default
   ## settings.
   ##
   MidiIn(impl: rtmidi_in_create_default())
 
-proc midiIn*(api: MidiApi; clientName: string; queueSizeLimit: Natural): MidiIn =
+proc initMidiIn*(api: MidiApi; clientName: string; queueSizeLimit: Natural
+                ): MidiIn =
   ## Creates a `MidiIn` with the given api, client name and queue size limit.
   ##
   MidiIn(impl: rtmidi_in_create(
@@ -211,6 +219,8 @@ proc midiIn*(api: MidiApi; clientName: string; queueSizeLimit: Natural): MidiIn 
   ))
 
 proc api*(dev: MidiIn): MidiApi =
+  ## Get the API in use for the given MidiIn.
+  ##
   cast[MidiApi](rtmidi_in_get_current_api(dev.impl))
 
 proc callbackWrapper(timestamp: float64; msg: ptr UncheckedArray[byte]; msgSize: csize_t; data: pointer) {.noconv.} =
@@ -220,10 +230,16 @@ proc callbackWrapper(timestamp: float64; msg: ptr UncheckedArray[byte]; msgSize:
   )
 
 proc removeCallback*(dev: var MidiIn) =
+  ## Remove a previously set callback.
+  ##
   dev.callback = nil
   rtmidi_in_cancel_callback(dev.impl)
 
 proc setCallback*(dev: var MidiIn; callback: MidiCallback) =
+  ## Registers a callback to handle incoming MIDI messages as soon as they
+  ## arrive. If `callback` is `nil` then the callback is removed via
+  ## `dev.removeCallback()`
+  ##
   if callback == nil:
     dev.removeCallback()
   else:
@@ -231,6 +247,9 @@ proc setCallback*(dev: var MidiIn; callback: MidiCallback) =
     rtmidi_in_set_callback(dev.impl, callbackWrapper, unsafeAddr(dev.callback))
 
 proc ignoreTypes*(dev: var MidiIn; msgTypes: set[MidiMsgType]) =
+  ## Ignores the given set of message types. Incoming MIDI messages of an
+  ## ignored type will not be queued or trigger a callback.
+  ##
   rtmidi_in_ignore_types(
     dev.impl,
     midiSysex in msgTypes,
@@ -238,7 +257,11 @@ proc ignoreTypes*(dev: var MidiIn; msgTypes: set[MidiMsgType]) =
     midiSense in msgTypes
   )
 
-proc recv*(dev: var MidiIn; msg: var seq[byte]): float64 =
+proc recvMidi*(dev: var MidiIn; msg: var seq[byte]): float64 =
+  ## Receive a MIDI message, storing its data into `msg`. The timestamp of
+  ## the received message is returned. If there is was no message then `msg`
+  ## will be empty. This proc does not block or wait for a message to arrive.
+  ##
   const maxMsgLen = 1024
   var 
     msgsize = maxMsgLen
@@ -252,16 +275,25 @@ proc recv*(dev: var MidiIn; msg: var seq[byte]): float64 =
   if msgsize > 0:
     copyMem(msg[0].addr, msgbuf[0].addr, msgsize.int)
 
-proc midiOut*(): MidiOut =
+proc initMidiOut*(): MidiOut =
+  ## Creates a `MidiOut` for sending MIDI messages, using default settings.
+  ##
   MidiOut(impl: rtmidi_out_create_default())
 
-proc midiOut*(api: MidiApi; clientName: string): MidiOut =
+proc initMidiOut*(api: MidiApi; clientName: string): MidiOut =
+  ## Creates a `MidiOut` for sending MIDI messages using a given API and
+  ## client name.
+  ##
   MidiOut(impl: rtmidi_out_create(
     cast[RtMidiApi](api), clientName.cstring
   ))
 
 proc api*(dev: MidiOut): MidiApi =
+  ## Gets the current API in use by this MidiOut.
+  ##
   cast[MidiApi](rtmidi_out_get_current_api(dev.impl))
 
-proc send*(dev: var MidiOut; msg: openArray[byte]): int {.discardable.} =
-  rtmidi_out_send_message(dev.impl, msg[0].unsafeAddr, msg.len.cint).int
+proc sendMidi*(dev: var MidiOut; msg: openArray[byte]): bool {.discardable.} =
+  ## Sends a MIDI message out the open port. `true` is returned on error.
+  ## 
+  rtmidi_out_send_message(dev.impl, msg[0].unsafeAddr, msg.len.cint) != 0

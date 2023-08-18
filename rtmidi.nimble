@@ -1,8 +1,8 @@
 # Package
 
-version       = "0.1.0"
+version       = "4.0.0.0"
 author        = "stoneface"
-description   = "Bindings for RtMidi, a MIDI input/output library"
+description   = "Bindings for RtMidi, a cross-platform MIDI input/output library"
 license       = "MIT"
 srcDir        = "src"
 
