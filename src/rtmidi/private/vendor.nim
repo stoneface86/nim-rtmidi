@@ -25,6 +25,10 @@ const
     args.add cdefine(apiDefine)
     when defined(vcc):
       args.add "/EHsc"
+    when defined(rtmidiUseJack):
+      when defined(windows):
+        {. error: "Cannot use JACK on windows" .}
+      args.add cdefine("__UNIX_JACK__")
     quoteShellCommand args
 
 {. compile("rtmidi_c.cpp", rtmidiPassc) .}
@@ -45,3 +49,7 @@ elif defined(windows):
     {. passl: "winmm.lib" .}
   else:
     {. passl: "-lwinmm" .}
+
+when defined(rtmidiUseJack):
+  {. passl: "-ljack" .}
+
