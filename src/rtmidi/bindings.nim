@@ -77,7 +77,8 @@ proc rtmidi_close_port*(device: RtMidiPtr)
   {.rtmidi.}
 proc rtmidi_get_port_count*(device: RtMidiPtr): cuint
   {.rtmidi.}
-proc rtmidi_get_port_name*(device: RtMidiPtr; portNum: cuint): cstring
+proc rtmidi_get_port_name*(device: RtMidiPtr; portNum: cuint; bufOut: cstring,
+                           bufLen: ptr cint): cint
   {.rtmidi.}
 
 # in

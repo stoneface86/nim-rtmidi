@@ -207,7 +207,21 @@ proc portCount*(dev: SomeMidi): int =
 proc portName*(dev: SomeMidi; portNum: Natural = 0): string =
   ## Gets the name of the given port.
   ##
-  $(rtmidi_get_port_name(dev.impl, portNum.cuint))
+  # get the length of the string first
+  let len = block:
+    var res: cint
+    discard rtmidi_get_port_name(dev.impl, portNum.cuint, nil, res.addr)
+    res.int
+  # now get the string
+  result = newString(len)
+  if len > 0:
+    var tmp = len.cint
+    discard rtmidi_get_port_name(
+      dev.impl, 
+      portNum.cuint,
+      cast[cstring](result[0].addr),
+      tmp.addr
+    )
 
 proc initMidiIn*(api = maUnspecified; clientName = "RtMidi Input Client"; 
                  queueSizeLimit: Natural = 100): MidiIn =
