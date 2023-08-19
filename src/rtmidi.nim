@@ -1,23 +1,23 @@
 ##
 ## High-level API for RtMidi
-## 
+##
 ## This module provides a high-level wrapper over the rtmidi bindings. The
 ## C API for rtmidi is wrapped so you can use either the C or C++ backends.
 ## 
-## Usage:
+## Usage
+## =====
 ## 
 ## Create a MidiIn object to receive MIDI data or a MidiOut object to send
 ## data. For both types you can query the devices (ports) available as well as
 ## their names. Then open a port to send/receive data.
 ## 
-## ```nim
-## var dev = midiIn() # midiOut() for output
-## # dev.portCount()
-## # dev.portName(num)
-## # dev.portOpen(num)
-## # etc
-## ```
-## 
+## .. code-block:: nim
+##   var dev = midiIn() # midiOut() for output
+##   echo dev.portCount()
+##   echo dev.portName(num)
+##   dev.portOpen(num)
+##   # etc
+##
 ## For receiving data with MidiIn, you can either use a callback to handle the
 ## data as soon as it comes in, or poll for it manually. Use `setCallback` to
 ## register the callback, or use `recvMidi` to receive the message manually.
@@ -27,18 +27,18 @@
 ## For sending data with MidiOut, using the `sendMidi` proc to send an array of
 ## bytes to a previously opened port.
 ## 
-## Error Handling:
+## Error Handling
+## ==============
 ## 
 ## The RtMidi C API catches any RtMidi exception and stores its error message.
 ## Therefore, none of the procs in this module will raise exceptions. You can
 ## check for errors by using the `ok` proc, which will return `false` on a
 ## Midi object if the last proc called on it caused an error. For example:
-## 
-## ```nim
-## if not device.ok:
-##   stderr.writeLine("midi error: " & device.getError())
-##   quit(1)
-## ```
+##
+## .. code-block:: nim 
+##   if not device.ok:
+##     stderr.writeLine("midi error: " & device.getError())
+##     quit(1)
 ##
 
 import rtmidi/bindings
@@ -120,11 +120,15 @@ when NimMajor >= 2:
   {. push warning[Deprecated]:off .}
 
 proc `=destroy`*(dev: var MidiIn) =
+  ## MidiIn destructor. Frees the previously allocated RtMidiInPtr.
+  ##
   if dev.impl != nil:
     rtmidi_in_free(dev.impl)
     dev.impl = nil
 
 proc `=destroy`*(dev: var MidiOut) =
+  ## MidiOut destructor. Frees the previously allocated RtMidiOutPtr.
+  ##
   if dev.impl != nil:
     rtmidi_out_free(dev.impl)
     dev.impl = nil
@@ -133,8 +137,11 @@ when NimMajor >= 2:
   {. pop .}
 
 proc `=copy`*(dst: var MidiIn; src: MidiIn) {.error.}
+  ## MidiIn objects cannot be copied
+  ##
 proc `=copy`*(dst: var MidiOut; src: MidiOut) {.error.}
-
+  ## MidiOut objects cannot be copied
+  ##
 
 proc ok*(m: SomeMidi): bool =
   ## Returns `true` when the last function call using this Midi device had
@@ -181,7 +188,7 @@ proc openPort*(dev: var SomeMidi; portNum: Natural = 0; portName = "RtMidi") =
   ##
   rtmidi_open_port(dev.impl, portNum.cuint, portName.cstring)
 
-proc openVirtualPort*(dev: var SomeMidi; portName: string) =
+proc openVirtualPort*(dev: var SomeMidi; portName = "RtMidi") =
   ## Opens a virtual MIDI port. Only supported on the JACK, ALSA and CoreMIDI
   ## backends.
   ##
@@ -197,19 +204,13 @@ proc portCount*(dev: SomeMidi): int =
   ##
   rtmidi_get_port_count(dev.impl).int
 
-proc portName*(dev: SomeMidi; portNum: Natural): string =
+proc portName*(dev: SomeMidi; portNum: Natural = 0): string =
   ## Gets the name of the given port.
   ##
   $(rtmidi_get_port_name(dev.impl, portNum.cuint))
 
-proc initMidiIn*(): MidiIn =
-  ## Creates a `MidiIn` for receiving incoming MIDI data, using default
-  ## settings.
-  ##
-  MidiIn(impl: rtmidi_in_create_default())
-
-proc initMidiIn*(api: MidiApi; clientName: string; queueSizeLimit: Natural
-                ): MidiIn =
+proc initMidiIn*(api = maUnspecified; clientName = "RtMidi Input Client"; 
+                 queueSizeLimit: Natural = 100): MidiIn =
   ## Creates a `MidiIn` with the given api, client name and queue size limit.
   ##
   MidiIn(impl: rtmidi_in_create(
@@ -275,12 +276,8 @@ proc recvMidi*(dev: var MidiIn; msg: var seq[byte]): float64 =
   if msgsize > 0:
     copyMem(msg[0].addr, msgbuf[0].addr, msgsize.int)
 
-proc initMidiOut*(): MidiOut =
-  ## Creates a `MidiOut` for sending MIDI messages, using default settings.
-  ##
-  MidiOut(impl: rtmidi_out_create_default())
-
-proc initMidiOut*(api: MidiApi; clientName: string): MidiOut =
+proc initMidiOut*(api = maUnspecified; clientName = "RtMidi Output Client"
+                 ): MidiOut =
   ## Creates a `MidiOut` for sending MIDI messages using a given API and
   ## client name.
   ##

@@ -1,3 +1,15 @@
+##
+## Vendored rtmidi source
+## 
+## When static linking, the vendored source code for rtmidi is compiled and
+## linked by this module.
+## 
+## The linking of rtmidi's dependencies are also handled here.
+## 
+## You do not need to import this module as it is imported by the bindings
+## module.
+##
+
 {.used.}
 
 import std/os

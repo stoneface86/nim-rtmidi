@@ -10,3 +10,16 @@ srcDir        = "src"
 # Dependencies
 
 requires "nim >= 1.4.0"
+
+import std/os
+
+task docs, "Generate documentation":
+  selfExec quoteShellCommand [
+    "--hints:off",
+    "--project",
+    "--index:on",
+    "-p:" & srcDir,
+    "--outdir:htmldocs",
+    "doc",
+    srcDir / "rtmidi.nim"
+  ]
