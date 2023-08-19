@@ -1,6 +1,9 @@
 # Package
+const 
+  rtmidiVersion = "4.0.0"
+  wrapperPatch = "0"
 
-version       = "4.0.0.0"
+version       = rtmidiVersion & "." & wrapperPatch
 author        = "stoneface"
 description   = "Bindings for RtMidi, a cross-platform MIDI input/output library"
 license       = "MIT"
@@ -18,6 +21,9 @@ task docs, "Generate documentation":
     "--hints:off",
     "--project",
     "--index:on",
+    "--git.url:https://github.com/stoneface86/nim-rtmidi",
+    "--git.commit:" & version,
+    "--git.devel:" & "rtmidi-" & rtmidiVersion,
     "-p:" & srcDir,
     "--outdir:htmldocs",
     "doc",
