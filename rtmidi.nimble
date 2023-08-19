@@ -1,6 +1,6 @@
 # Package
 const 
-  rtmidiVersion = "4.0.0"
+  rtmidiVersion = "5.0.0"
   wrapperPatch = "0"
 
 version       = rtmidiVersion & "." & wrapperPatch
