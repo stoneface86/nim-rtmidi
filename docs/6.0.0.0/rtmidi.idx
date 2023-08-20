@@ -1,0 +1,62 @@
+nimTitle	rtmidi	rtmidi.html	module rtmidi		0
+nim	MidiCallback	rtmidi.html#MidiCallback	type MidiCallback		47
+nim	MidiIn	rtmidi.html#MidiIn	object MidiIn		57
+nim	MidiOut	rtmidi.html#MidiOut	object MidiOut		70
+nim	SomeMidi	rtmidi.html#SomeMidi	type SomeMidi		83
+nim	maUnspecified	rtmidi.html#maUnspecified	MidiApi.maUnspecified		87
+nim	maMacosxCore	rtmidi.html#maMacosxCore	MidiApi.maMacosxCore		87
+nim	maLinuxAlsa	rtmidi.html#maLinuxAlsa	MidiApi.maLinuxAlsa		87
+nim	maUnixJack	rtmidi.html#maUnixJack	MidiApi.maUnixJack		87
+nim	maWindowsMM	rtmidi.html#maWindowsMM	MidiApi.maWindowsMM		87
+nim	maDummy	rtmidi.html#maDummy	MidiApi.maDummy		87
+nim	maWebMidi	rtmidi.html#maWebMidi	MidiApi.maWebMidi		87
+nim	maWindowsUWP	rtmidi.html#maWindowsUWP	MidiApi.maWindowsUWP		87
+nim	maAndroid	rtmidi.html#maAndroid	MidiApi.maAndroid		87
+nim	MidiApi	rtmidi.html#MidiApi	enum MidiApi		87
+nim	meWarning	rtmidi.html#meWarning	MidiError.meWarning		100
+nim	meDebugWarning	rtmidi.html#meDebugWarning	MidiError.meDebugWarning		100
+nim	meUnspecified	rtmidi.html#meUnspecified	MidiError.meUnspecified		100
+nim	meNoDevicesFound	rtmidi.html#meNoDevicesFound	MidiError.meNoDevicesFound		100
+nim	meInvalidDevice	rtmidi.html#meInvalidDevice	MidiError.meInvalidDevice		100
+nim	meMemory	rtmidi.html#meMemory	MidiError.meMemory		100
+nim	meInvalidParameter	rtmidi.html#meInvalidParameter	MidiError.meInvalidParameter		100
+nim	meInvalidUse	rtmidi.html#meInvalidUse	MidiError.meInvalidUse		100
+nim	meDriver	rtmidi.html#meDriver	MidiError.meDriver		100
+nim	meSystem	rtmidi.html#meSystem	MidiError.meSystem		100
+nim	meThread	rtmidi.html#meThread	MidiError.meThread		100
+nim	MidiError	rtmidi.html#MidiError	enum MidiError		100
+nim	midiSysex	rtmidi.html#midiSysex	MidiMsgType.midiSysex		115
+nim	midiTime	rtmidi.html#midiTime	MidiMsgType.midiTime		115
+nim	midiSense	rtmidi.html#midiSense	MidiMsgType.midiSense		115
+nim	MidiMsgType	rtmidi.html#MidiMsgType	enum MidiMsgType		115
+nim	`=destroy`	rtmidi.html#=destroy,MidiIn	proc `=destroy`(dev: var MidiIn)		125
+nim	`=destroy`	rtmidi.html#=destroy,MidiOut	proc `=destroy`(dev: var MidiOut)		132
+nim	`=copy`	rtmidi.html#=copy,MidiIn,MidiIn	proc `=copy`(dst: var MidiIn; src: MidiIn)		142
+nim	`=copy`	rtmidi.html#=copy,MidiOut,MidiOut	proc `=copy`(dst: var MidiOut; src: MidiOut)		145
+nim	ok	rtmidi.html#ok,SomeMidi	proc ok(m: SomeMidi): bool		149
+nim	getError	rtmidi.html#getError,SomeMidi	proc getError(m: SomeMidi): string		155
+nim	getVersion	rtmidi.html#getVersion	proc getVersion(): string		160
+nim	getCompiledApis	rtmidi.html#getCompiledApis	proc getCompiledApis(): set[MidiApi]		163
+nim	name	rtmidi.html#name,MidiApi	proc name(api: MidiApi): string		171
+nim	displayName	rtmidi.html#displayName,MidiApi	proc displayName(api: MidiApi): string		176
+nim	getApiByName	rtmidi.html#getApiByName,string	proc getApiByName(name: string): MidiApi		181
+nim	error	rtmidi.html#error,MidiError,string	proc error(ty: MidiError; errorStr: string)		187
+nim	openPort	rtmidi.html#openPort,SomeMidi,Natural,string	proc openPort(dev: var SomeMidi; portNum: Natural = 0; portName = "RtMidi")		192
+nim	openVirtualPort	rtmidi.html#openVirtualPort,SomeMidi,string	proc openVirtualPort(dev: var SomeMidi; portName = "RtMidi")		197
+nim	closePort	rtmidi.html#closePort,SomeMidi	proc closePort(dev: var SomeMidi)		203
+nim	portCount	rtmidi.html#portCount,SomeMidi	proc portCount(dev: SomeMidi): int		208
+nim	portName	rtmidi.html#portName,SomeMidi,Natural	proc portName(dev: SomeMidi; portNum: Natural = 0): string		213
+nim	initMidiIn	rtmidi.html#initMidiIn,string,Natural	proc initMidiIn(api = maUnspecified; clientName = "RtMidi Input Client";\n           queueSizeLimit: Natural = 100): MidiIn		232
+nim	api	rtmidi.html#api,MidiIn	proc api(dev: MidiIn): MidiApi		242
+nim	removeCallback	rtmidi.html#removeCallback,MidiIn	proc removeCallback(dev: var MidiIn)		253
+nim	setCallback	rtmidi.html#setCallback,MidiIn,MidiCallback	proc setCallback(dev: var MidiIn; callback: MidiCallback)		259
+nim	ignoreTypes	rtmidi.html#ignoreTypes,MidiIn,set[MidiMsgType]	proc ignoreTypes(dev: var MidiIn; msgTypes: set[MidiMsgType])		270
+nim	recvMidi	rtmidi.html#recvMidi,MidiIn,seq[byte]	proc recvMidi(dev: var MidiIn; msg: var seq[byte]): float64		281
+nim	initMidiOut	rtmidi.html#initMidiOut,string	proc initMidiOut(api = maUnspecified; clientName = "RtMidi Output Client"): MidiOut		299
+nim	api	rtmidi.html#api,MidiOut	proc api(dev: MidiOut): MidiApi		308
+nim	sendMidi	rtmidi.html#sendMidi,MidiOut,openArray[byte]	proc sendMidi(dev: var MidiOut; msg: openArray[byte]): bool		313
+nimgrp	api	rtmidi.html#api-procs-all	proc		242
+nimgrp	=copy	rtmidi.html#=copy-procs-all	proc		142
+nimgrp	=destroy	rtmidi.html#=destroy-procs-all	proc		125
+heading	Usage	rtmidi.html#usage	 Usage		0
+heading	Error Handling	rtmidi.html#error-handling	 Error Handling		0
