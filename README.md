@@ -67,9 +67,9 @@ By default the DLL file used depends on your OS:
  - MacOS: `librtmidi.dylib`
  - Windows: `rtmidi.dll`
 
+Define `rtmidiDll` to override this filename.
+
 # License
 
 This library is licensed under the [MIT License](./LICENSE). RtMidi is licensed under
 a [modified MIT License](https://www.music.mcgill.ca/~gary/rtmidi/index.html#license).
-
-Define `rtmidiDll` to override this filename.
