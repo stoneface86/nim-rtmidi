@@ -1,8 +1,9 @@
 
 # nim-rtmidi
 
-Nim wrapper for RtMidi, a cross-platform realtime MIDI input/output library.
-This wrapper contains both low-level bindings and a high-level API. 
+Nim wrapper for [RtMidi](https://www.music.mcgill.ca/~gary/rtmidi/), a
+cross-platform realtime MIDI input/output library. This wrapper contains both
+low-level bindings and a high-level API. 
 
 ## Versioning
 
@@ -12,11 +13,13 @@ version is `1`.
 
 The following versions are available:
 
-| RtMidi version | Status      |
-|----------------|-------------|
-| 4.0.0          | In progress |
-| 5.0.0          | not started |
-| 6.0.0          | not started |
+| RtMidi version | nim-rtmidi version |
+|----------------|--------------------|
+| 6.0.0          | 6.0.0.0            |
+| 5.0.0          | 5.0.0.0            |
+| 4.0.0          | 4.0.0.0            |
+
+**v6.0.0.0** is the current stable version.
 
 ## Dependencies
 
@@ -25,7 +28,7 @@ Nim v1.4.0 and up is required.
 A vendored copy of RtMidi is included in this repository when linking
 statically, so you will need to install RtMidi's dependencies:
 
- - Linux:   ALSA development libraries
+ - Linux:   ALSA development libraries, pthreads
  - OSX:     None
  - Windows: None
 
@@ -63,5 +66,10 @@ By default the DLL file used depends on your OS:
  - Linux: `librtmidi.so`
  - MacOS: `librtmidi.dylib`
  - Windows: `rtmidi.dll`
+
+# License
+
+This library is licensed under the [MIT License](./LICENSE). RtMidi is licensed under
+a [modified MIT License](https://www.music.mcgill.ca/~gary/rtmidi/index.html#license).
 
 Define `rtmidiDll` to override this filename.
