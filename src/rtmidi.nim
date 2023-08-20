@@ -93,6 +93,9 @@ type
     maUnixJack    ## Unix JACK
     maWindowsMM   ## Windows MultiMedia (winmm)
     maDummy       ## RtMidi Dummy
+    maWebMidi     ## W3C Web MIDI API
+    maWindowsUWP  ## Windows Universal Windows Platform MIDI API
+    maAndroid     ## Android MIDI API
   
   MidiError* = enum
     ## A category of error that has occurred
@@ -153,6 +156,9 @@ proc getError*(m: SomeMidi): string =
   ## Gets the error message that occurred if `m.ok` was `false`.
   ##
   result = $(m.impl[].msg)
+
+proc getVersion*(): string =
+  result = $(rtmidi_get_version())
 
 proc getCompiledApis*(): set[MidiApi] =
   ## Gets all MIDI API support that was compiled with this version of RtMidi.

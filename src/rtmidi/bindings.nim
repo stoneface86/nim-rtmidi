@@ -30,6 +30,9 @@ type
     RTMIDI_API_UNIX_JACK
     RTMIDI_API_WINDOWS_MM
     RTMIDI_API_RTMIDI_DUMMY
+    RTMIDI_API_WEB_MIDI_API
+    RTMIDI_API_WINDOWS_UWP
+    RTMIDI_API_ANDROID
     RTMIDI_API_NUM
   
   RtMidiErrorType* {. size: sizeof(cint) .} = enum
@@ -57,6 +60,8 @@ else:
 {. push importc, noconv .} # ==================================================
 
 # general
+proc rtmidi_get_version*(): cstring
+  {.rtmidi.}
 proc rtmidi_get_compiled_api*(apis: ptr RtMidiApi; len: cuint): cint
   {.rtmidi.}
 proc rtmidi_api_name*(api: RtMidiApi): cstring
