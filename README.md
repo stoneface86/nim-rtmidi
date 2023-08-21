@@ -37,7 +37,7 @@ statically, so you will need to install RtMidi's dependencies:
 Install via nimble:
 
 ```sh
-nimble install "https://github.com/stoneface86/nim-rtmidi"
+nimble install rtmidi
 ```
 
 Then use in your project:
